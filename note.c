@@ -23,19 +23,18 @@ void enableRaw() {
 }
 
 void refreshScreen(char *buf, int len, int pos) {
-    // Ekranı temizle ve metni bas
+
     write(STDOUT_FILENO, "\x1b[2J\x1b[H", 7);
     write(STDOUT_FILENO, buf, len);
     
-    // İmleç koordinat hesaplama
+
     int row = 1, col = 1;
     for (int i = 0; i < pos; i++) {
         if (buf[i] == '\n') {
             row++;
             col = 1;
         } else {
-            // UTF-8 karakterlerin ekranda tek sütun kaplamasını sağla
-            // (10xxxxxx ile başlayan byte'lar ekranda yer kaplamaz)
+
             if ((buf[i] & 0xc0) != 0x80) col++;
         }
     }
@@ -67,27 +66,27 @@ int main(int argc, char *argv[]) {
         if (read(STDIN_FILENO, &c, 1) == 0) continue;
         if (c == 17) break; // CTRL+Q
 
-        if (c == 27) { // Ok Tuşları
+        if (c == 27) { 
             unsigned char seq[2];
             if (read(STDIN_FILENO, &seq[0], 1) && read(STDIN_FILENO, &seq[1], 1)) {
                 if (seq[0] == '[') {
                     if (seq[1] == 'C' && pos < len) {
                         pos++;
-                        // Eğer çoklu byte karakterin ortasındaysak sonuna kadar atla
+
                         while (pos < len && (buf[pos] & 0xc0) == 0x80) pos++;
                     }
                     if (seq[1] == 'D' && pos > 0) {
                         pos--;
-                        // Çoklu byte karakterin başına kadar geri git
+
                         while (pos > 0 && (buf[pos] & 0xc0) == 0x80) pos--;
                     }
                 }
             }
         } 
-        else if (c == 127 || c == 8) { // BACKSPACE DÜZELTMESİ
+        else if (c == 127 || c == 8) { 
             if (pos > 0) {
                 int start = pos;
-                // UTF-8 karakterin başlangıç byte'ını bulana kadar geri git
+
                 do {
                     pos--;
                 } while (pos > 0 && (buf[pos] & 0xc0) == 0x80);
@@ -103,7 +102,7 @@ int main(int argc, char *argv[]) {
             buf[pos] = '\n';
             len++; pos++;
         } 
-        else if (c >= 32 || c > 127) { // Karakter ekleme
+        else if (c >= 32 || c > 127) {
             if (len < 8191) {
                 memmove(&buf[pos + 1], &buf[pos], len - pos);
                 buf[pos] = c;
