@@ -27,5 +27,5 @@ A minimal terminal-based text editor written in C using raw mode and UTF-8 aware
 Clone the repository:
 
 ```bash
-git clone https://github.com/yourusername/rawedit.git
-cd rawedit
+git clone https://github.com/lAlsancakl/mini-text-editor.git
+cd mini-text-editor
